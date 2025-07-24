@@ -14,7 +14,6 @@ import CompaniesPage from './pages/CompaniesPage';
 import CompanyDetailsPage from './pages/CompanyDetailsPage';
 import CreateExperiencePage from './pages/CreateExperiencePage';
 import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -52,7 +51,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/companies" element={<CompaniesPage companies={companies} />} />
               <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
+              
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />

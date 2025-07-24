@@ -17,9 +17,7 @@ export default function Footer() {
             <Link to="/about" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">
               About
             </Link>
-            <Link to="/contact" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">
-              Contact
-            </Link>
+            
             <Link to="/privacy-policy" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">
               Privacy Policy
             </Link>
