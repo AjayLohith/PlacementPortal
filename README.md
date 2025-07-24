@@ -33,33 +33,51 @@ To get a local copy up and running, follow these simple steps.
 
 ### Prerequisites
 
-* Node.js installed on your machine.
-* A MongoDB Atlas account and your connection string.
+- Node.js installed on your machine.
+- A MongoDB Atlas account and your connection string.
 
 ### Installation & Setup
 
-1.  **Clone the repository**
-    ```bash
-    git clone [https://github.com/your-username/placementpedia.git](https://github.com/your-username/placementpedia.git)
-    cd placementpedia
-    ```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/placementpedia.git
+   cd placementpedia
+   ```
 
-2.  **Backend Setup**
-    * Navigate to the `server` directory: `cd server`
-    * Create a `.env` file and add your environment variables:
-        ```
-        MONGO_URI=<Your_MongoDB_Connection_String>
-        JWT_SECRET=<Your_JWT_Secret_Key>
-        PORT=5001
-        ```
-    * Install dependencies: `npm install`
-    * Run the server: `npm run dev`
+2. **Backend Setup**
+   - Navigate to the `server` directory:
+     ```bash
+     cd server
+     ```
+   - Create a `.env` file and add your environment variables:
+     ```
+     MONGO_URI=<Your_MongoDB_Connection_String>
+     JWT_SECRET=<Your_JWT_Secret_Key>
+     PORT=5001
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Run the server:
+     ```bash
+     npm run dev
+     ```
 
-3.  **Frontend Setup**
-    * Navigate to the `client` directory: `cd client`
-    * Create a `.env` file and add the API URL:
-        ```
-        VITE_API_URL=http://localhost:5001
-        ```
-    * Install dependencies: `npm install`
-    * Run the client: `npm run dev`
+3. **Frontend Setup**
+   - Navigate to the `client` directory:
+     ```bash
+     cd client
+     ```
+   - Create a `.env` file and add the API URL:
+     ```
+     VITE_API_URL=http://localhost:5001
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Run the client:
+     ```bash
+     npm run dev
+     ```
