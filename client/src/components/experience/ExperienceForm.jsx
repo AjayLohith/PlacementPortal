@@ -1,17 +1,21 @@
-// Location: client/src/components/ExperienceForm.jsx
+// Location: client/src/components/experience/ExperienceForm.jsx
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+// FIX: Corrected the import path for AuthContext
+import { useAuth } from '../../context/AuthContext';
 
-// It now accepts an onNewExperience prop
-export default function ExperienceForm({ onNewCompany, companies, onNewExperience }) {
+export default function ExperienceForm({ companies }) {
     const navigate = useNavigate();
+    const { userInfo } = useAuth();
+
     const [formData, setFormData] = useState({
-        postTitle: "My Interview Experience at TechCorp Inc.",
+        postTitle: "",
         companyName: companies[0]?.name || 'Other',
         interviewDate: new Date().toISOString().split('T')[0],
         interviewRounds: [
-            { roundName: "Initial Screening", duration: "30 minutes", method: "Phone", focus: "Resume and background check.", keyQuestions: "", obstacles: "" }
+            { roundName: "", duration: "", method: "", focus: "", keyQuestions: "", obstacles: "" }
         ],
         suggestions: "",
         additionalInfo: "",
@@ -19,6 +23,8 @@ export default function ExperienceForm({ onNewCompany, companies, onNewExperienc
     });
 
     const [otherCompany, setOtherCompany] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     
     const handleRoundChange = (index, e) => {
         const { name, value } = e.target;
@@ -32,47 +38,45 @@ export default function ExperienceForm({ onNewCompany, companies, onNewExperienc
             ...prev,
             interviewRounds: [
                 ...prev.interviewRounds,
-                {
-                    roundName: "Managerial Round",
-                    duration: "",
-                    method: "Video Call",
-                    focus: "",
-                    keyQuestions: "",
-                    obstacles: ""
-                }
+                { roundName: "", duration: "", method: "", focus: "", keyQuestions: "", obstacles: "" }
             ]
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        setIsLoading(true);
         
-        const finalCompanyName = formData.companyName === 'Other' ? otherCompany : formData.companyName;
+        try {
+            const finalCompanyName = formData.companyName === 'Other' ? otherCompany : formData.companyName;
+            const dataToSubmit = { ...formData, companyName: finalCompanyName };
+            
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`,
+                },
+            };
 
-        if (formData.companyName === 'Other' && otherCompany) {
-            onNewCompany(otherCompany);
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/experiences`, dataToSubmit, config);
+            
+            navigate('/thank-you');
+
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || "An error occurred submitting the form.");
+        } finally {
+            setIsLoading(false);
         }
-
-        const dataToSubmit = {
-            ...formData,
-            companyName: finalCompanyName,
-            timestamp: new Date().toISOString()
-        };
-        
-        // Call the new handler function to pass data up to App.jsx
-        onNewExperience(dataToSubmit);
-        
-        // Navigate to the company's page after submission
-        const companySlug = finalCompanyName.toLowerCase().replace(/\s+/g, '-');
-        navigate(`/${companySlug}`);
     };
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-xl shadow-lg space-y-8 animate-fade-in">
+            {error && <p className="bg-red-100 text-red-700 p-3 rounded-md mb-4 text-center">{error}</p>}
+            <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-xl shadow-lg space-y-8">
+                {/* FIX: Added all form fields and JSX back into the component */}
                 <div className="space-y-4">
-                     <EditableField label="Post Title" name="postTitle" value={formData.postTitle} onChange={(e) => setFormData({...formData, postTitle: e.target.value})} />
-                     
+                     <EditableField label="Post Title" name="postTitle" value={formData.postTitle} onChange={(e) => setFormData({...formData, postTitle: e.target.value})} placeholder="e.g., My Interview Experience at..." />
                      <div>
                         <label htmlFor="companyName" className="block text-sm font-medium text-slate-600 mb-1">Company Name</label>
                         <select
@@ -88,7 +92,6 @@ export default function ExperienceForm({ onNewCompany, companies, onNewExperienc
                              <option value="Other">Other</option>
                         </select>
                      </div>
-
                      {formData.companyName === 'Other' && (
                         <EditableField
                             label="Please specify company name"
@@ -97,10 +100,8 @@ export default function ExperienceForm({ onNewCompany, companies, onNewExperienc
                             onChange={(e) => setOtherCompany(e.target.value)}
                         />
                      )}
-
                      <EditableField label="Interview Date" name="interviewDate" type="date" value={formData.interviewDate} onChange={(e) => setFormData({...formData, interviewDate: e.target.value})} />
                 </div>
-
                 <FormSection title="Interview Process">
                     {formData.interviewRounds.map((round, index) => (
                         <div key={index} className="space-y-4 border border-slate-200 rounded-lg p-4 mt-4">
@@ -117,24 +118,22 @@ export default function ExperienceForm({ onNewCompany, companies, onNewExperienc
                         + Add Another Round
                     </button>
                 </FormSection>
-                
                  <FormSection title="Suggestions & Final Thoughts">
                     <EditableField label="Suggestions for Improvement" name="suggestions" value={formData.suggestions} onChange={(e) => setFormData({...formData, suggestions: e.target.value})} isTextarea={true} />
                     <EditableField label="Additional Information" name="additionalInfo" value={formData.additionalInfo} onChange={(e) => setFormData({...formData, additionalInfo: e.target.value})} isTextarea={true} />
                     <EditableField label="Closing Note" name="closingNote" value={formData.closingNote} onChange={(e) => setFormData({...formData, closingNote: e.target.value})} isTextarea={true} />
                  </FormSection>
-
                 <div className="flex justify-end pt-4">
-                    <button type="submit" className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
-                        Post Experience
+                    <button type="submit" disabled={isLoading} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400">
+                        {isLoading ? 'Submitting...' : 'Post Experience'}
                     </button>
                 </div>
             </form>
-            <div id="feedback-message" className="hidden fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg"></div>
         </>
     );
 }
 
+// Helper component for section headers
 const FormSection = ({ title, children }) => (
     <div className="border-t border-slate-200 pt-6">
         <h3 className="text-xl font-bold text-slate-800 mb-4">{title}</h3>
@@ -142,7 +141,8 @@ const FormSection = ({ title, children }) => (
     </div>
 );
 
-const EditableField = ({ label, name, value, onChange, type = "text", isTextarea = false }) => (
+// Helper component for form fields
+const EditableField = ({ label, name, value, onChange, type = "text", isTextarea = false, placeholder = "" }) => (
     <div>
         <label htmlFor={name} className="block text-sm font-medium text-slate-600 mb-1">{label}</label>
         {isTextarea ? (
@@ -152,6 +152,7 @@ const EditableField = ({ label, name, value, onChange, type = "text", isTextarea
                 value={value}
                 onChange={onChange}
                 rows="4"
+                placeholder={placeholder}
                 className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition"
             />
         ) : (
@@ -161,21 +162,9 @@ const EditableField = ({ label, name, value, onChange, type = "text", isTextarea
                 name={name}
                 value={value}
                 onChange={onChange}
+                placeholder={placeholder}
                 className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition"
             />
         )}
     </div>
 );
-
-const style = document.createElement('style');
-style.innerHTML = `
-    @keyframes fade-in {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fade-in {
-        animation: fade-in 0.5s ease-out forwards;
-    }
-`;
-document.head.appendChild(style);
-    

@@ -15,12 +15,12 @@ const experienceSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User', // Creates a reference to the User model
+    ref: 'User',
   },
   company: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'Company', // Creates a reference to the Company model
+    ref: 'Company',
   },
   postTitle: {
     type: String,
@@ -30,12 +30,18 @@ const experienceSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  interviewRounds: [roundSchema], // An array of the round schema defined above
+  interviewRounds: [roundSchema],
   suggestions: { type: String },
   additionalInfo: { type: String },
   closingNote: { type: String },
+  // FIX: This field was missing. It's now added with a default of 'false'.
+  isApproved: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 }, {
-  timestamps: true, // Automatically adds createdAt and updatedAt fields
+  timestamps: true,
 });
 
 const Experience = mongoose.model('Experience', experienceSchema);

@@ -4,18 +4,25 @@ import express from 'express';
 import {
   createExperience,
   getExperiencesByCompany,
+  getPendingExperiences,
+  getApprovedExperiences, // Make sure this is imported
+  approveExperience,
+  deleteExperience,
 } from '../controllers/experienceController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// @route   /api/experiences
+// --- ADMIN ROUTES ---
+router.route('/admin/pending').get(protect, admin, getPendingExperiences);
+router.route('/admin/approved').get(protect, admin, getApprovedExperiences); // This route is required
+router.route('/admin/:id/approve').put(protect, admin, approveExperience);
+router.route('/admin/:id').delete(protect, admin, deleteExperience);
 
-// POST / -> Create a new experience (Protected)
-// We add the 'protect' middleware here to ensure only authenticated users can post.
+// --- USER ROUTES ---
 router.route('/').post(protect, createExperience);
 
-// GET /:companySlug -> Get all experiences for a specific company (Public)
+// --- PUBLIC ROUTES ---
 router.route('/:companySlug').get(getExperiencesByCompany);
 
 export default router;
